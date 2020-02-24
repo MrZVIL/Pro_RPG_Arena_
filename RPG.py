@@ -1,8 +1,8 @@
+#присоединение библиотек
 import pygame
 import os
 import random
-
-
+ 
 pygame.mixer.init()
 pygame.init()
 
@@ -14,7 +14,7 @@ def load_image(name):
     image = pygame.image.load(fullname).convert()
     image.set_colorkey((0, 255, 0))
     return(image)
-
+#создание переменных
 BLACK = (  0,   0,   0)
 WHITE = (255, 255, 255)
 BLUE =  (  0,   0, 255)
@@ -39,8 +39,9 @@ size = width, height = [800, 800]
 transportC = None
 screen = pygame.display.set_mode(size)
 all_sprites = pygame.sprite.Group()
-
+#класс игрока
 class Player(pygame.sprite.Sprite):
+    #чтение картинок
     image1_down = load_image('war1_down.png')
     image2_down = load_image('war2_down.png')
     image3_down = load_image('war3_down.png')
@@ -55,6 +56,7 @@ class Player(pygame.sprite.Sprite):
     image3_left = load_image('war3_left.png')
 
     def __init__(self, group):
+        #инициализация
         super().__init__(group)
         self.image = Player.image1_down
         self.rect = self.image.get_rect()
@@ -67,6 +69,7 @@ class Player(pygame.sprite.Sprite):
         self.life = life
 
     def update(self, args):
+        #обновление персонажа в новом шаге игрового цикла
         global lvl
         global damage
         global armor
@@ -82,6 +85,7 @@ class Player(pygame.sprite.Sprite):
         self.armor = armor
         self.life = life
         self.money = money
+        #изменение положения персонажа
         if running_sprite == True:
             hpx, hpy = self.rect.x, self.rect.y
             self.tik += 1
@@ -139,7 +143,7 @@ class Player(pygame.sprite.Sprite):
                     self.rect.x += 3
                 elif go_fast == 0:
                     self.rect.x += 1
-            
+            #проверка на переход на следующий уровень
             if self.rect.x < -32:
                 transportC = 'l'
                 self.rect.x = width - 1
@@ -160,7 +164,7 @@ class Player(pygame.sprite.Sprite):
                 self.rect.y = -45
                 lvl += 1
                 fGreen = (105, random.randrange(150, 255, 15), 105)
-            
+            #вывод информации о персонаже
             a1 = pygame.font.Font(None, 25)
             b1 = a1.render(f'Level: {self.lvl}', 1, RED)
             xt1 = 700
@@ -194,7 +198,7 @@ class Player(pygame.sprite.Sprite):
             if next_l == 2:
                 transportC = None
                 next_l = 0
-                
+        #проверки на окончание игры        
         if life <= 0:
             attack = None
             running_sprite = False
@@ -218,17 +222,18 @@ class Player(pygame.sprite.Sprite):
             xtq = 500
             ytq = 510
             screen.blit(bq, (xtq, ytq))
-
+#класс сундук
 class Chest(pygame.sprite.Sprite):
+    #чтение изображения
     image1 = load_image('chest1.png')
-
+    #инициализация
     def __init__(self, group):
         super().__init__(group)
         self.image = Chest.image1
         self.rect = self.image.get_rect()
         self.rect.x = -1000
         self.rect.y = -1000
-
+    #обновление сундука в новом шаге игрового цикла
     def update(self, args):
         global transportC
         global next_l
@@ -244,6 +249,7 @@ class Chest(pygame.sprite.Sprite):
                 if '[<Player sprite(in 1 groups)>, <Chest sprite(in 1 groups)>]' == str(blocks_hit_list):
                     self.rect.x = -1000
                     self.rect.y = -1000
+                    #проверка на открытие сундука
                     if lvl // 10 == 0:
                         j = random.random()
                         if j >= 0.5:
@@ -339,8 +345,9 @@ class Chest(pygame.sprite.Sprite):
                 self.rect.y = random.randrange(40, 730)
                 next_l += 1
             
-        
+#класс скелета
 class Skeletron(pygame.sprite.Sprite):
+    #чтение изображения
     image1_down = load_image('skel1_down.png')
     image2_down = load_image('skel2_down.png')
     image3_down = load_image('skel3_down.png')
@@ -353,7 +360,7 @@ class Skeletron(pygame.sprite.Sprite):
     image1_left = load_image('skel1_left.png')
     image2_left = load_image('skel2_left.png')
     image3_left = load_image('skel3_left.png')
-
+    #инициализация
     def __init__(self, group):
         super().__init__(group)
         self.image = Skeletron.image1_down
@@ -367,8 +374,8 @@ class Skeletron(pygame.sprite.Sprite):
         self.k = 0
         self.at = 0
         self.bat = 1
-        self.no = 0
-
+        self.no = 0#нет = 0(False=0)
+    #обновление скелета в новом шаге игрового цикла
     def update(self, args):
         global transportC
         global next_l
@@ -396,6 +403,7 @@ class Skeletron(pygame.sprite.Sprite):
             if self.tik == 41:
                 self.tik = 0
             if (self.rect.x - 250 < hpx < self.rect.x + 250 and self.rect.y - 250 < hpy < self.rect.y + 250) and self.k == 0:
+                #перемещение скелета
                 if hpx > self.rect.x:
                     self.rect.x += 1
                     if self.tik == 20:
@@ -421,6 +429,7 @@ class Skeletron(pygame.sprite.Sprite):
                     if self.tik == 40:
                         self.image = Skeletron.image3_up
             elif self.k == 1:
+                #сражение
                 attack = 'skel'
                 if attack == 'skel':
                     if self.life <= 0:
@@ -455,12 +464,13 @@ class Skeletron(pygame.sprite.Sprite):
                         self.at = 0
                         self.bat = 1
             elif self.k == 0:
+                #да
                 attack = None
         else:
             self.image = Skeletron.image1_down
                 
 
-
+#создание спрайтов
 Player(all_sprites)
 Chest(all_sprites)
 Skeletron(all_sprites)
@@ -469,7 +479,7 @@ img = pygame.image.load('data\icon.png')
 pygame.display.set_icon(img)
 
 
-
+#создание переменных 2: нужно больше памяти
 go_up = 0
 go_down = 0
 go_left = 0
@@ -478,7 +488,7 @@ go_fast = 0
 fps = 120
 running = True
 clock = pygame.time.Clock()
- 
+#игровой цикл
 while running:
     clock.tick(fps)
     screen.fill(fGreen)
